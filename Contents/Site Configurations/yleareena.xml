@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site site="http://areena.yle.fi/"
+      plugin="http://areena.yle.fi/player/Application.swf.*"
+      initialState="loading"
+      version="1.0">
+
+  <crop x="0" y="0" width="0" height="0"/>
+  <seekbar type="javascript">
+    <percentComplete equals="($.getPlaybackTime()/duration) * 100" />
+    <bigStep minus="$.seekTo($.getPlaybackTime() - 10)" plus="$.seekTo($.getPlaybackTime() + 10)" />
+    <smallStep minus="$.seekTo($.getPlaybackTime() - 30)" plus="$.seekTo($.getPlaybackTime() + 30)" />
+    <end condition="(duration !== 0 &amp;&amp; $.getPlaybackTime() > duration)" />
+  </seekbar>
+
+  <!-- NAMED CONDITIONAL DEFINITION -->
+  <condition name="buffering">
+    <and>
+      <color x="1" y="1" rgb="000000"/>
+      <color x="50" y="1" rgb="000000"/>
+    </and>
+  </condition>
+
+	<!-- PLAYING -->
+	<state name="playing">
+		<!-- Click to pause -->
+		<event>
+			<condition>
+			  <and>
+				  <command name="pause" />
+				  <not>
+            <condition name="buffering"/>
+          </not>
+				</and>
+			</condition>
+			<action>
+			  <click x="350" y="190" />
+			  <move x="300" y="-50" />
+			  <click x="350" y="-25" />
+				<goto state="paused" />
+			</action>
+		</event>
+	</state>
+	
+	<!-- PAUSED -->
+	<state name="paused">		
+		<!-- Wait for play command -->
+		<event>
+			<condition>
+			 	<command name="play" />
+			</condition>
+			<action>
+			  <click x="350" y="190" />
+			  <move x="300" y="-50" />
+			  <click x="350" y="-25" />
+			 	<goto state="playing" />
+			</action>
+		</event>
+	</state>
+
+	<state name="loading">
+		<event>
+			<condition>
+			 	<command name="pause" />
+			</condition>
+			<action>
+			  <run script="duration = 0;var a = jQuery(&quot;.relatedinfo-text li&quot;).text().match(/Kesto (\d+):(\d+):(\d+)/).splice(1, 3);duration += Number(a[0]) * 60 * 60;duration += Number(a[1]) * 60;duration += Number(a[2]);" />
+			  <type key="32" />
+			  <run script="playbackStarted = false;"/>
+			</action>
+		</event>
+	</state>
+</site>
